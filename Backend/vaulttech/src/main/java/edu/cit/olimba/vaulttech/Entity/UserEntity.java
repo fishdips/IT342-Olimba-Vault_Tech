@@ -11,6 +11,9 @@ public class UserEntity {
     private Long id;
 
     @Column(unique = true, nullable = false)
+    private String username;
+
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -22,7 +25,8 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(String email, String password, String firstName, String lastName) {
+    public UserEntity(String username, String email, String password, String firstName, String lastName) {
+        this.username = username;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -35,6 +39,14 @@ public class UserEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
