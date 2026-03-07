@@ -1,25 +1,21 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // <-- Import useNavigate
+import { useNavigate } from "react-router-dom";
 import "../css/login.css";
 
 function Login() {
-  const navigate = useNavigate(); // <-- Initialize navigate
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       const response = await fetch(
         `http://localhost:8080/api/users/login?email=${email}&password=${password}`,
         { method: "POST" }
       );
-
       const data = await response.text();
       alert(data);
-
-
     } catch (error) {
       console.error("Login error:", error);
       alert("Server error");
@@ -27,33 +23,47 @@ function Login() {
   };
 
   return (
-    <div className="login-container">
-      <h1>Login</h1>
+    <div className="login-page">
+      <div className="login-card">
+        
+        <div className="login-header">
+          <div className="logo-box"></div>
+          <h1 className="login-title">Welcome Back</h1>
+        </div>
 
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          required
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <p className="login-subtitle">Sign in to your digital vault</p>
 
-        <input
-          type="password"
-          placeholder="Password"
-          required
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <form onSubmit={handleLogin} className="login-form">
 
-        <button type="submit">Login</button>
-      </form>
+          <div className="field-group">
+            <label>Email Address</label>
+            <input
+              type="email"
+              required
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
-      <p>
-        Don't have an account?{" "}
-        <span className="link" onClick={() => navigate("/register")}>
-          Create one
-        </span>
-      </p>
+          <div className="field-group">
+            <label>Password</label>
+            <input
+              type="password"
+              required
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <button type="submit" className="login-btn">Log In</button>
+        </form>
+
+        <p className="register-redirect">
+          Don't have an account?{" "}
+          <span className="register-link" onClick={() => navigate("/register")}>
+            Register
+          </span>
+        </p>
+
+      </div>
     </div>
   );
 }
