@@ -1,0 +1,21 @@
+.login-container {
+  width: 350px;
+  margin: 120px auto;
+  text-align: center;
+  font-family: Arial;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #16a34a;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
