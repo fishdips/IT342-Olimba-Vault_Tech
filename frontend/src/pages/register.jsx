@@ -2,6 +2,44 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/register.css";
 
+/* Reusable gear SVG â€” same component as in Login */
+function Gear({ teeth = 8, r = 38, stroke = "#0a6aa8", strokeWidth = 2 }) {
+  const R = r;
+  const ri = R * 0.72;
+  const toothH = R * 0.22;
+
+  let d = "";
+  for (let i = 0; i < teeth; i++) {
+    const angNext = ((i + 1) / teeth) * Math.PI * 2;
+    const a1 = (i / teeth) * Math.PI * 2 + 0.12;
+    const a2 = (i / teeth) * Math.PI * 2 + Math.PI / teeth - 0.12;
+    const a3 = (i / teeth) * Math.PI * 2 + Math.PI / teeth + 0.12;
+    const a4 = angNext - 0.12;
+
+    const cos = (a) => Math.cos(a);
+    const sin = (a) => Math.sin(a);
+
+    if (i === 0) d += `M ${ri * cos(a1)} ${ri * sin(a1)} `;
+    d += `L ${(R + toothH) * cos(a1)} ${(R + toothH) * sin(a1)} `;
+    d += `L ${(R + toothH) * cos(a2)} ${(R + toothH) * sin(a2)} `;
+    d += `L ${ri * cos(a3)} ${ri * sin(a3)} `;
+    d += `L ${ri * cos(a4)} ${ri * sin(a4)} `;
+  }
+  d += "Z";
+
+  const cx = R + toothH + 4;
+
+  return (
+    <svg
+      viewBox={`${-cx} ${-cx} ${cx * 2} ${cx * 2}`}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d={d} stroke={stroke} strokeWidth={strokeWidth} fill="none" strokeLinejoin="round" />
+      <circle cx="0" cy="0" r={ri * 0.35} stroke={stroke} strokeWidth={strokeWidth} fill="none" />
+    </svg>
+  );
+}
+
 function Register() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -35,6 +73,21 @@ function Register() {
 
   return (
     <div className="register-page">
+
+      {/* Floating gear background */}
+      <div className="gear-layer">
+        <Gear teeth={12} r={56} strokeWidth={2.5} />
+        <Gear teeth={7}  r={26} strokeWidth={2}   />
+        <Gear teeth={16} r={72} strokeWidth={2.5} />
+        <Gear teeth={9}  r={36} strokeWidth={2}   />
+        <Gear teeth={14} r={62} strokeWidth={2.5} />
+        <Gear teeth={6}  r={24} strokeWidth={2}   />
+        <Gear teeth={10} r={48} strokeWidth={2.5} />
+        <Gear teeth={5}  r={20} strokeWidth={2}   />
+        <Gear teeth={8}  r={40} strokeWidth={2}   />
+        <Gear teeth={6}  r={18} strokeWidth={1.8} />
+      </div>
+
       <div className="register-card">
 
         <div className="register-header">
@@ -46,7 +99,6 @@ function Register() {
 
         <form onSubmit={handleRegister} className="register-form">
 
-          {/* First Name & Last Name side by side */}
           <div className="name-row">
             <div className="field-group">
               <label>First Name</label>

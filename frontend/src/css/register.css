@@ -1,140 +1,316 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg-deep:        #001423;
+  --bg-card:        #011d33;
+  --bg-input:       #02243e;
+  --bg-input-focus: #032b4a;
+  --border:         #0a3a5c;
+  --blue:           #0066b1;
+  --blue-light:     #1a85d4;
+  --brown:          #8b5c29;
+  --brown-light:    #ffe1ba;
+  --brown-dim:      rgba(139, 92, 41, 0.15);
+  --yellow:         #fff773;
+  --yellow-dim:     rgba(255, 247, 115, 0.1);
+  --text-primary:   #ffe1ba;
+  --text-secondary: #4a7a9b;
+  --text-label:     #6a9dbf;
+  --radius:         10px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Gear Keyframes ─────────────────────────────── */
+@keyframes spin-cw  { from { transform: rotate(0deg);   } to { transform: rotate(360deg);  } }
+@keyframes spin-ccw { from { transform: rotate(0deg);   } to { transform: rotate(-360deg); } }
+@keyframes drift    { from { transform: translate(0, 0); } to { transform: translate(30px, 20px); } }
+@keyframes cardIn   { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* ─── Page ───────────────────────────────────────── */
 .register-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f9fafb;
-  font-family: 'Courier New', Courier, monospace;
+  background-color: var(--bg-deep);
+  font-family: 'Jost', sans-serif;
+  position: relative;
+  overflow: hidden;
+  padding: 40px 0;
 }
 
+/* Soft ambient glows */
+.register-page::before {
+  content: '';
+  position: fixed;
+  top: -20%;
+  left: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0,102,177,0.10) 0%, transparent 65%);
+  pointer-events: none;
+  animation: drift 12s ease-in-out infinite alternate;
+}
+
+.register-page::after {
+  content: '';
+  position: fixed;
+  bottom: -20%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(139,92,41,0.08) 0%, transparent 65%);
+  pointer-events: none;
+  animation: drift 16s ease-in-out infinite alternate-reverse;
+}
+
+/* ─── SVG Gear Layer ─────────────────────────────── */
+.gear-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.gear-layer svg {
+  position: absolute;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gear-layer svg:nth-child(1) {
+  top: 6%;  left: 2%;
+  width: 140px; height: 140px;
+  opacity: 0.07;
+  animation: spin-cw 28s linear infinite;
+}
+.gear-layer svg:nth-child(2) {
+  top: 10%; left: 13%;
+  width: 68px; height: 68px;
+  opacity: 0.05;
+  animation: spin-ccw 16s linear infinite;
+}
+.gear-layer svg:nth-child(3) {
+  top: -4%; right: 6%;
+  width: 180px; height: 180px;
+  opacity: 0.06;
+  animation: spin-ccw 38s linear infinite;
+}
+.gear-layer svg:nth-child(4) {
+  top: 30%; right: 1%;
+  width: 90px; height: 90px;
+  opacity: 0.055;
+  animation: spin-cw 22s linear infinite;
+}
+.gear-layer svg:nth-child(5) {
+  bottom: 8%; right: 10%;
+  width: 160px; height: 160px;
+  opacity: 0.065;
+  animation: spin-cw 34s linear infinite;
+}
+.gear-layer svg:nth-child(6) {
+  bottom: 14%; right: 24%;
+  width: 70px; height: 70px;
+  opacity: 0.05;
+  animation: spin-ccw 18s linear infinite;
+}
+.gear-layer svg:nth-child(7) {
+  bottom: 5%; left: 5%;
+  width: 120px; height: 120px;
+  opacity: 0.06;
+  animation: spin-ccw 30s linear infinite;
+}
+.gear-layer svg:nth-child(8) {
+  bottom: 20%; left: 14%;
+  width: 55px; height: 55px;
+  opacity: 0.045;
+  animation: spin-cw 14s linear infinite;
+}
+.gear-layer svg:nth-child(9) {
+  top: 45%; left: -2%;
+  width: 100px; height: 100px;
+  opacity: 0.05;
+  animation: spin-cw 25s linear infinite;
+}
+.gear-layer svg:nth-child(10) {
+  top: 50%; right: 18%;
+  width: 50px; height: 50px;
+  opacity: 0.04;
+  animation: spin-ccw 12s linear infinite;
+}
+
+/* ─── Card ───────────────────────────────────────── */
 .register-card {
-  width: 420px;
-  padding: 40px 48px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  width: 440px;
+  padding: 48px 44px 40px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 24px 60px rgba(0,0,0,0.6),
+    0 4px 16px rgba(0,0,0,0.4);
+  animation: cardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* Blue top-border accent */
+.register-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+  border-radius: 999px;
+}
+
+/* ─── Header ─────────────────────────────────────── */
 .register-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 8px;
+  gap: 16px;
+  margin-bottom: 10px;
 }
 
 .logo-box {
-  width: 48px;
-  height: 48px;
-  background-color: #6b7280;
-  border-radius: 8px;
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(135deg, #011d33, #032b4a);
+  border: 1px solid var(--blue);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
   flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 0 16px rgba(0,102,177,0.25);
 }
 
 .register-title {
-  font-size: 28px;
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
   font-weight: 700;
-  color: #111827;
-  margin: 0;
-  font-family: 'Courier New', Courier, monospace;
+  color: var(--brown-light);
+  letter-spacing: 1px;
 }
 
 .register-subtitle {
   font-size: 13px;
-  color: #6b7280;
-  margin: 0 0 28px 0;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
   letter-spacing: 0.3px;
+  font-weight: 300;
 }
 
+/* ─── Form ───────────────────────────────────────── */
 .register-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
+/* First name / Last name row */
 .name-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 14px;
-}
-
-.name-row .field-group {
-  flex: 1;
 }
 
 .field-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 7px;
 }
 
 .field-group label {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
-  color: #374151;
-  font-family: 'Courier New', Courier, monospace;
+  color: var(--text-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
 .field-group input {
-  padding: 10px 12px;
-  background-color: #e5e7eb;
-  border: none;
-  border-radius: 6px;
+  padding: 12px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   font-size: 14px;
-  font-family: 'Courier New', Courier, monospace;
-  color: #111827;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  color: var(--brown-light);
   outline: none;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
-  box-sizing: border-box;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  caret-color: var(--yellow);
+}
+
+.field-group input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.5;
 }
 
 .field-group input:focus {
-  background-color: #d1d5db;
-  box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.4);
+  background: var(--bg-input-focus);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(0,102,177,0.15);
 }
 
+/* ─── Button ─────────────────────────────────────── */
 .register-btn {
   width: 100%;
-  padding: 12px;
-  margin-top: 6px;
-  background-color: #4b5563;
+  padding: 13px;
+  margin-top: 4px;
+  background: linear-gradient(-45deg, var(--blue), var(--blue-light));
   color: #ffffff;
   border: none;
-  border-radius: 6px;
-  font-size: 15px;
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0,102,177,0.3);
 }
 
 .register-btn:hover {
-  background-color: #374151;
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(0,102,177,0.45);
 }
 
-/* ── Login redirect ── */
+.register-btn:active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
 .login-redirect {
-  margin-top: 16px;
+  margin-top: 24px;
   text-align: center;
   font-size: 13px;
-  color: #6b7280;
-  font-family: 'Courier New', Courier, monospace;
+  color: var(--text-secondary);
 }
 
 .login-link {
-  color: #374151;
+  color: var(--yellow);
   cursor: pointer;
-  text-decoration: underline;
   font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
 }
 
 .login-link:hover {
-  color: #111827;
+  color: #fffff0;
+  border-color: var(--yellow);
 }
