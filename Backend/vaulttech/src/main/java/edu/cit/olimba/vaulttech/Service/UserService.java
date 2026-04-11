@@ -2,6 +2,7 @@ package edu.cit.olimba.vaulttech.Service;
 
 import edu.cit.olimba.vaulttech.Entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import edu.cit.olimba.vaulttech.Repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
