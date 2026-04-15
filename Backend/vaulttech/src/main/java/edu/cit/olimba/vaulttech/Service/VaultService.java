@@ -1,6 +1,5 @@
 package edu.cit.olimba.vaulttech.Service;
 
-
 import edu.cit.olimba.vaulttech.Entity.VaultEntity;
 import edu.cit.olimba.vaulttech.Repository.VaultRepository;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,10 +30,9 @@ public class VaultService {
         return vaultRepository.findByIdAndOwnerUsername(id, username);
     }
 
-
     public VaultEntity createVault(String name, LocalDate expiryDate,
-                             String ownerUsername, String vaultType,
-                             String thumbnailColor) {
+                                   String ownerUsername, String vaultType,
+                                   String thumbnailColor, String vaultPassword) {
 
         if (vaultRepository.existsByNameAndOwnerUsername(name, ownerUsername)) {
             throw new IllegalArgumentException(
@@ -42,14 +40,14 @@ public class VaultService {
         }
 
         VaultEntity vault = new VaultEntity(name, LocalDate.now(), expiryDate,
-                ownerUsername, vaultType, thumbnailColor);
+                ownerUsername, vaultType, thumbnailColor, vaultPassword);
         return vaultRepository.save(vault);
     }
 
-
     public VaultEntity updateVault(Long id, String username, String newName,
-                             LocalDate newExpiryDate, String vaultType,
-                             String thumbnailColor) {
+                                   LocalDate newExpiryDate, String vaultType,
+                                   String thumbnailColor, String successorEmail,
+                                   Boolean isDeadmanEnabled, Integer deadmanDays) {
 
         VaultEntity vault = vaultRepository.findByIdAndOwnerUsername(id, username)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -59,20 +57,27 @@ public class VaultService {
         if (newExpiryDate != null) vault.setExpiryDate(newExpiryDate);
         if (vaultType != null) vault.setVaultType(vaultType);
         if (thumbnailColor != null) vault.setThumbnailColor(thumbnailColor);
+        vault.setSuccessorEmail(successorEmail);
+        vault.setIsDeadmanEnabled(isDeadmanEnabled != null ? isDeadmanEnabled : false);
+        vault.setDeadmanDays(deadmanDays);
 
         vault.computeDaysRemaining();
         return vaultRepository.save(vault);
     }
 
+    public boolean verifyVaultPassword(Long id, String username, String password) {
+        VaultEntity vault = vaultRepository.findByIdAndOwnerUsername(id, username)
+                .orElseThrow(() -> new IllegalArgumentException("Vault not found."));
 
+        return vault.getVaultPassword().equals(password);
+    }
 
     public boolean deleteVault(Long id, String username) {
-    int deletedCount = vaultRepository.deleteByIdAndOwnerUsername(id, username);
-    return deletedCount > 0;
-}
+        int deletedCount = vaultRepository.deleteByIdAndOwnerUsername(id, username);
+        return deletedCount > 0;
+    }
 
-
-    @Scheduled(cron = "0 0 0 * * *") //This will refresh the date, runs every midnight
+    @Scheduled(cron = "0 0 0 * * *")
     public void refreshDaysRemaining() {
         List<VaultEntity> vaults = vaultRepository.findAllActiveWithExpiry();
         for (VaultEntity v : vaults) {
