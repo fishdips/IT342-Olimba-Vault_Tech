@@ -54,15 +54,14 @@ function Login() {
         `http://localhost:8080/api/users/login?email=${email}&password=${password}`,
         { method: "POST" }
       );
-      const data = await response.text();
       
-      // Check if the response is successful
+      const data = await response.text(); 
+      
       if (response.ok) {
-        // Navigate to the dashboard on success
+        localStorage.setItem("username", data); 
         navigate("/dashboard");
       } else {
-        // Show the error message if login fails
-        alert(data);
+        alert(data); 
       }
     } catch (error) {
       console.error("Login error:", error);

@@ -53,6 +53,6 @@ public class UserService {
             return "Invalid email or password.";
         }
 
-        return "Login successful.";
+        return user.getUsername();
     }
 }

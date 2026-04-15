@@ -30,23 +30,37 @@ public class VaultEntity {
     private Boolean isActive = true;
 
     @Column(name = "vault_type")
-    private String vaultType; // e.g. "Will", "Documents", "Photos", etc.
+    private String vaultType;
 
     @Column(name = "thumbnail_color")
-    private String thumbnailColor; // hex color for card header accent
+    private String thumbnailColor;
 
-    // ── Constructors ──────────────────────────────────────────
+    @Column(name = "vault_password", nullable = false)
+    private String vaultPassword;
+
+    @Column(name = "successor_email")
+    private String successorEmail;
+
+    @Column(name = "is_deadman_enabled")
+    private Boolean isDeadmanEnabled = false;
+
+    @Column(name = "deadman_days")
+    private Integer deadmanDays;
+
     public VaultEntity() {}
 
+    // UPDATED: Added vaultPassword to the constructor
     public VaultEntity(String name, LocalDate createdDate, LocalDate expiryDate,
-                 String ownerUsername, String vaultType, String thumbnailColor) {
+                       String ownerUsername, String vaultType, String thumbnailColor, String vaultPassword) {
         this.name = name;
         this.createdDate = createdDate;
         this.expiryDate = expiryDate;
         this.ownerUsername = ownerUsername;
         this.vaultType = vaultType;
         this.thumbnailColor = thumbnailColor;
+        this.vaultPassword = vaultPassword;
         this.isActive = true;
+        this.isDeadmanEnabled = false;
         computeDaysRemaining();
     }
 
@@ -57,7 +71,6 @@ public class VaultEntity {
         }
     }
 
-    // ── Getters & Setters ─────────────────────────────────────
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -84,4 +97,16 @@ public class VaultEntity {
 
     public String getThumbnailColor() { return thumbnailColor; }
     public void setThumbnailColor(String thumbnailColor) { this.thumbnailColor = thumbnailColor; }
+
+    public String getVaultPassword() { return vaultPassword; }
+    public void setVaultPassword(String vaultPassword) { this.vaultPassword = vaultPassword; }
+
+    public String getSuccessorEmail() { return successorEmail; }
+    public void setSuccessorEmail(String successorEmail) { this.successorEmail = successorEmail; }
+
+    public Boolean getIsDeadmanEnabled() { return isDeadmanEnabled; }
+    public void setIsDeadmanEnabled(Boolean isDeadmanEnabled) { this.isDeadmanEnabled = isDeadmanEnabled; }
+
+    public Integer getDeadmanDays() { return deadmanDays; }
+    public void setDeadmanDays(Integer deadmanDays) { this.deadmanDays = deadmanDays; }
 }
