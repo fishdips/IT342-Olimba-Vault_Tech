@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login } from "../auth"; 
 import "../css/login.css";
 
-/* Reusable gear SVG — teeth count & inner-radius vary per call */
 function Gear({ teeth = 8, r = 38, stroke = "#85bfe6", strokeWidth = 2 }) {
   const R = r;
   const ri = R * 0.72;
@@ -12,15 +12,12 @@ function Gear({ teeth = 8, r = 38, stroke = "#85bfe6", strokeWidth = 2 }) {
   for (let i = 0; i < teeth; i++) {
     const ang = (i / teeth) * Math.PI * 2;
     const angNext = ((i + 1) / teeth) * Math.PI * 2;
-
     const a1 = ang + 0.12;
     const a2 = ang + Math.PI / teeth - 0.12;
     const a3 = ang + Math.PI / teeth + 0.12;
     const a4 = angNext - 0.12;
-
     const cos = (a) => Math.cos(a);
     const sin = (a) => Math.sin(a);
-
     if (i === 0) d += `M ${ri * cos(a1)} ${ri * sin(a1)} `;
     d += `L ${(R + toothH) * cos(a1)} ${(R + toothH) * sin(a1)} `;
     d += `L ${(R + toothH) * cos(a2)} ${(R + toothH) * sin(a2)} `;
@@ -28,14 +25,10 @@ function Gear({ teeth = 8, r = 38, stroke = "#85bfe6", strokeWidth = 2 }) {
     d += `L ${ri * cos(a4)} ${ri * sin(a4)} `;
   }
   d += "Z";
-
   const cx = R + toothH + 4;
 
   return (
-    <svg
-      viewBox={`${-cx} ${-cx} ${cx * 2} ${cx * 2}`}
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg viewBox={`${-cx} ${-cx} ${cx * 2} ${cx * 2}`} xmlns="http://www.w3.org/2000/svg">
       <path d={d} stroke={stroke} strokeWidth={strokeWidth} fill="none" strokeLinejoin="round" />
       <circle cx="0" cy="0" r={ri * 0.35} stroke={stroke} strokeWidth={strokeWidth} fill="none" />
     </svg>
@@ -46,33 +39,27 @@ function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/users/login?email=${email}&password=${password}`,
-        { method: "POST" }
-      );
-      
-      const data = await response.text(); 
-      
-      if (response.ok) {
-        localStorage.setItem("username", data); 
-        navigate("/dashboard");
-      } else {
-        alert(data); 
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      alert("Server error");
+    setError("");
+    setLoading(true);
+
+    const result = await login(email, password);
+
+    if (result.ok) {
+      navigate("/dashboard");
+    } else {
+      setError(result.error);
     }
+
+    setLoading(false);
   };
 
   return (
     <div className="login-page">
-
-      {/* Floating gear background */}
       <div className="gear-layer">
         <Gear teeth={12} r={56} strokeWidth={2.5} />
         <Gear teeth={7}  r={26} strokeWidth={2}   />
@@ -87,7 +74,6 @@ function Login() {
       </div>
 
       <div className="login-card">
-
         <div className="login-header">
           <div className="logo-box"></div>
           <h1 className="login-title">Welcome Back</h1>
@@ -96,12 +82,12 @@ function Login() {
         <p className="login-subtitle">Sign in to your digital vault</p>
 
         <form onSubmit={handleLogin} className="login-form">
-
           <div className="field-group">
             <label>Email Address</label>
             <input
               type="email"
               required
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
@@ -111,11 +97,21 @@ function Login() {
             <input
               type="password"
               required
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
-          <button type="submit" className="login-btn">Log In</button>
+          {/* ✅ ADDED: shows error inline instead of alert() */}
+          {error && (
+            <p style={{ color: "#ff4c4c", fontSize: "13px", fontWeight: "500", margin: "0 0 12px" }}>
+              {error}
+            </p>
+          )}
+
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? "Signing in…" : "Log In"}
+          </button>
         </form>
 
         <p className="register-redirect">
@@ -124,7 +120,6 @@ function Login() {
             Register
           </span>
         </p>
-
       </div>
     </div>
   );
