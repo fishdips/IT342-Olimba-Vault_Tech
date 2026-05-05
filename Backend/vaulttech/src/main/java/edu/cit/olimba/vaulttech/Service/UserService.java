@@ -1,58 +1,59 @@
 package edu.cit.olimba.vaulttech.Service;
 
 import edu.cit.olimba.vaulttech.Entity.UserEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import edu.cit.olimba.vaulttech.Repository.UserRepository;
+import edu.cit.olimba.vaulttech.Security.JwtUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    public UserService(UserRepository userRepository,
+                       BCryptPasswordEncoder passwordEncoder,
+                       JwtUtil jwtUtil) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+    }
 
     public String registerUser(UserEntity user) {
-
-        if(user.getUsername() == null || user.getFirstName() == null || user.getLastName() == null ||
-                user.getEmail() == null || user.getPassword() == null){
+        if (user.getUsername() == null || user.getFirstName() == null ||
+                user.getLastName() == null || user.getEmail() == null ||
+                user.getPassword() == null) {
             return "All fields are required.";
         }
-
-        if(userRepository.existsByUsername(user.getUsername())){
+        if (userRepository.existsByUsername(user.getUsername())) {
             return "Username already exists.";
         }
-
-        if(userRepository.existsByEmail(user.getEmail())){
+        if (userRepository.existsByEmail(user.getEmail())) {
             return "Email already exists.";
         }
-
-        String hashedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(hashedPassword);
-
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-
         return "User registered successfully.";
     }
 
-    public String loginUser(String email, String password){
-
+    public Map<String, String> loginUser(String email, String password) {
         Optional<UserEntity> userOptional = userRepository.findByEmail(email);
 
-        if(userOptional.isEmpty()){
-            return "Invalid email or password.";
-        }
+        if (userOptional.isEmpty()) return null;
 
         UserEntity user = userOptional.get();
 
-        if(!passwordEncoder.matches(password, user.getPassword())){
-            return "Invalid email or password.";
-        }
+        if (!passwordEncoder.matches(password, user.getPassword())) return null;
+        user.setLastActiveDate(LocalDate.now());
+        userRepository.save(user);
 
-        return user.getUsername();
+        String token = jwtUtil.generateToken(user.getUsername());
+        return Map.of("token", token, "username", user.getUsername());
     }
 }

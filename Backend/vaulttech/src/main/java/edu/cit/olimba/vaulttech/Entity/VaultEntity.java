@@ -83,7 +83,15 @@ public class VaultEntity {
     public LocalDate getExpiryDate() { return expiryDate; }
     public void setExpiryDate(LocalDate expiryDate) { this.expiryDate = expiryDate; }
 
-    public Integer getDaysRemaining() { return daysRemaining; }
+    // UPDATED: Dynamically calculates days remaining exactly when requested
+    public Integer getDaysRemaining() {
+        if (this.expiryDate != null) {
+            long days = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), this.expiryDate);
+            return (int) Math.max(days, 0);
+        }
+        return daysRemaining;
+    }
+
     public void setDaysRemaining(Integer daysRemaining) { this.daysRemaining = daysRemaining; }
 
     public String getOwnerUsername() { return ownerUsername; }
