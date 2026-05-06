@@ -102,7 +102,6 @@ function Login() {
             />
           </div>
 
-          {/* ✅ ADDED: shows error inline instead of alert() */}
           {error && (
             <p style={{ color: "#ff4c4c", fontSize: "13px", fontWeight: "500", margin: "0 0 12px" }}>
               {error}

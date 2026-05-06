@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/register.css";
 
-/* Reusable gear SVG â€” same component as in Login */
 function Gear({ teeth = 8, r = 38, stroke = "#0a6aa8", strokeWidth = 2 }) {
   const R = r;
   const ri = R * 0.72;
@@ -74,7 +73,6 @@ function Register() {
   return (
     <div className="register-page">
 
-      {/* Floating gear background */}
       <div className="gear-layer">
         <Gear teeth={12} r={56} strokeWidth={2.5} />
         <Gear teeth={7}  r={26} strokeWidth={2}   />

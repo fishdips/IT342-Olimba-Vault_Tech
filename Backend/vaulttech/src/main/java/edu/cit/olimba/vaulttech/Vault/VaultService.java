@@ -103,7 +103,6 @@ public class VaultService {
             try {
                 emailService.sendVaultInheritorAssigned(successorEmail, username, vault.getName());
             } catch (Exception e) {
-                // Don't fail the save if email fails — log and continue
                 System.err.println("Failed to send inheritor assignment email: " + e.getMessage());
             }
         }
