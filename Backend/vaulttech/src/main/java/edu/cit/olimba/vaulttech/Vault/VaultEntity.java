@@ -49,7 +49,6 @@ public class VaultEntity {
 
     public VaultEntity() {}
 
-    // UPDATED: Added vaultPassword to the constructor
     public VaultEntity(String name, LocalDate createdDate, LocalDate expiryDate,
                        String ownerUsername, String vaultType, String thumbnailColor, String vaultPassword) {
         this.name = name;
@@ -83,7 +82,6 @@ public class VaultEntity {
     public LocalDate getExpiryDate() { return expiryDate; }
     public void setExpiryDate(LocalDate expiryDate) { this.expiryDate = expiryDate; }
 
-    // UPDATED: Dynamically calculates days remaining exactly when requested
     public Integer getDaysRemaining() {
         if (this.expiryDate != null) {
             long days = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), this.expiryDate);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseclient";
-import { authFetch, getUsername, logout } from "../auth"; // ✅ ADDED
+import { authFetch, getUsername, logout } from "../auth";
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -511,7 +511,6 @@ function EditVaultModal({ username, vault, onClose, onUpdated, onVaultTriggered 
                 />
               </div>
 
-              {/* ✅ ADDED: Manual trigger button */}
               <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
                 <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
                   Trigger the vault immediately and send all contents to your inheritor now.
