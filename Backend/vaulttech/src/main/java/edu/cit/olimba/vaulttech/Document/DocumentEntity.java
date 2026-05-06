@@ -1,5 +1,6 @@
 package edu.cit.olimba.vaulttech.Entity;
 
+import edu.cit.olimba.vaulttech.Vault.VaultEntity;
 import jakarta.persistence.*;
 
 @Entity
@@ -37,7 +38,6 @@ public class DocumentEntity {
     public String getFileUrl() { return fileUrl; }
     public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }
 
-    // We don't expose the full vault object in the getter to avoid infinite JSON recursion
     public Long getVaultId() { return vault != null ? vault.getId() : null; }
     public void setVault(VaultEntity vault) { this.vault = vault; }
 }
