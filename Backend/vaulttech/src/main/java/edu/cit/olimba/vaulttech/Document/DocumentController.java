@@ -1,9 +1,9 @@
 package edu.cit.olimba.vaulttech.Controller;
 
 import edu.cit.olimba.vaulttech.Entity.DocumentEntity;
-import edu.cit.olimba.vaulttech.Entity.VaultEntity;
+import edu.cit.olimba.vaulttech.Vault.VaultEntity;
 import edu.cit.olimba.vaulttech.Repository.DocumentRepository;
-import edu.cit.olimba.vaulttech.Repository.VaultRepository;
+import edu.cit.olimba.vaulttech.Vault.VaultRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
