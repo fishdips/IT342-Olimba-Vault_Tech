@@ -49,7 +49,7 @@ public class VaultController {
         try {
             String name           = body.get("name");
             String ownerUsername  = body.get("ownerUsername");
-            String vaultType      = body.getOrDefault("vaultType", "General");
+            String vaultType      = body.getOrDefault("vaultType", "Secure Vault");
             String thumbnailColor = body.getOrDefault("thumbnailColor", "#0066b1");
             String expiryStr      = body.get("expiryDate");
             String vaultPassword  = body.get("vaultPassword");
@@ -75,15 +75,17 @@ public class VaultController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateVault(@PathVariable Long id,
-                                         @RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> updateVault(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         try {
             String username       = (String) body.get("username");
             String name           = (String) body.get("name");
             String vaultType      = (String) body.get("vaultType");
             String thumbnailColor = (String) body.get("thumbnailColor");
             String expiryStr      = (String) body.get("expiryDate");
-            String successorEmail = (String) body.get("successorEmail");
+
+            @SuppressWarnings("unchecked")
+            List<String> successorEmails = (List<String>) body.get("successorEmails");
+
             Boolean isDeadman     = (Boolean) body.get("isDeadmanEnabled");
             Integer deadmanDays   = body.get("deadmanDays") != null
                     ? Integer.parseInt(body.get("deadmanDays").toString()) : null;
@@ -96,18 +98,16 @@ public class VaultController {
 
             VaultEntity updated = vaultService.updateVault(
                     id, username, name, expiryDate, vaultType, thumbnailColor,
-                    successorEmail, isDeadman, deadmanDays);
+                    successorEmails, isDeadman, deadmanDays);
 
             return ResponseEntity.ok(updated);
-
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteVault(@PathVariable Long id,
-                                              @RequestParam String username) {
+    public ResponseEntity<String> deleteVault(@PathVariable Long id, @RequestParam String username) {
         boolean deleted = vaultService.deleteVault(id, username);
         if (deleted) {
             return ResponseEntity.ok("Vault deleted successfully.");
@@ -118,8 +118,7 @@ public class VaultController {
     }
 
     @PostMapping("/{id}/verify")
-    public ResponseEntity<?> verifyPassword(@PathVariable Long id,
-                                            @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> verifyPassword(@PathVariable Long id, @RequestBody Map<String, String> body) {
         try {
             String username = body.get("username");
             String password = body.get("password");
@@ -133,8 +132,7 @@ public class VaultController {
     }
 
     @PostMapping("/{id}/trigger")
-    public ResponseEntity<?> manualTrigger(@PathVariable Long id,
-                                           @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> manualTrigger(@PathVariable Long id, @RequestBody Map<String, String> body) {
         try {
             String username = body.get("username");
             if (username == null || username.isBlank())

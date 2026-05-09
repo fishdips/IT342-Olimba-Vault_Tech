@@ -1,7 +1,10 @@
 package edu.cit.olimba.vaulttech.Vault;
 
+import edu.cit.olimba.vaulttech.Document.DocumentEntity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "vaults")
@@ -38,14 +41,19 @@ public class VaultEntity {
     @Column(name = "vault_password", nullable = false)
     private String vaultPassword;
 
-    @Column(name = "successor_email")
-    private String successorEmail;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "vault_inheritors", joinColumns = @JoinColumn(name = "vault_id"))
+    @Column(name = "email")
+    private List<String> successorEmails = new ArrayList<>();
 
     @Column(name = "is_deadman_enabled")
     private Boolean isDeadmanEnabled = false;
 
     @Column(name = "deadman_days")
     private Integer deadmanDays;
+
+    @OneToMany(mappedBy = "vault", fetch = FetchType.EAGER)
+    private List<DocumentEntity> documents;
 
     public VaultEntity() {}
 
@@ -72,16 +80,12 @@ public class VaultEntity {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-
     public LocalDate getCreatedDate() { return createdDate; }
     public void setCreatedDate(LocalDate createdDate) { this.createdDate = createdDate; }
-
     public LocalDate getExpiryDate() { return expiryDate; }
     public void setExpiryDate(LocalDate expiryDate) { this.expiryDate = expiryDate; }
-
     public Integer getDaysRemaining() {
         if (this.expiryDate != null) {
             long days = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), this.expiryDate);
@@ -89,30 +93,21 @@ public class VaultEntity {
         }
         return daysRemaining;
     }
-
-    public void setDaysRemaining(Integer daysRemaining) { this.daysRemaining = daysRemaining; }
-
     public String getOwnerUsername() { return ownerUsername; }
     public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
-
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-
     public String getVaultType() { return vaultType; }
     public void setVaultType(String vaultType) { this.vaultType = vaultType; }
-
     public String getThumbnailColor() { return thumbnailColor; }
     public void setThumbnailColor(String thumbnailColor) { this.thumbnailColor = thumbnailColor; }
-
     public String getVaultPassword() { return vaultPassword; }
     public void setVaultPassword(String vaultPassword) { this.vaultPassword = vaultPassword; }
-
-    public String getSuccessorEmail() { return successorEmail; }
-    public void setSuccessorEmail(String successorEmail) { this.successorEmail = successorEmail; }
-
+    public List<String> getSuccessorEmails() { return successorEmails; }
+    public void setSuccessorEmails(List<String> successorEmails) { this.successorEmails = successorEmails; }
     public Boolean getIsDeadmanEnabled() { return isDeadmanEnabled; }
     public void setIsDeadmanEnabled(Boolean isDeadmanEnabled) { this.isDeadmanEnabled = isDeadmanEnabled; }
-
     public Integer getDeadmanDays() { return deadmanDays; }
     public void setDeadmanDays(Integer deadmanDays) { this.deadmanDays = deadmanDays; }
+    public List<DocumentEntity> getDocuments() { return documents; }
 }

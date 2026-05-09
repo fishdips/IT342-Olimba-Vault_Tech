@@ -19,7 +19,6 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── Gear animations ── */
 @keyframes spin-cw  { to { transform: rotate(360deg);  } }
 @keyframes spin-ccw { to { transform: rotate(-360deg); } }
 @keyframes drift    { from { transform: translate(0,0); } to { transform: translate(30px,20px); } }
@@ -28,7 +27,6 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Page shell ── */
 .dashboard-page {
   min-height: 100vh;
   background-color: var(--bg-deep);
@@ -534,3 +532,10 @@
 
 .modal-error   { font-size: 12px; color: #e07070; }
 .modal-success { font-size: 12px; color: #70c070; }
+
+.vault-logo-image {
+    width: 100%;
+    height: auto;
+    max-width: 200px; 
+    object-fit: contain;
+}

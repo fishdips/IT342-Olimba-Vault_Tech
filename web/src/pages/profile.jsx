@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { authFetch, getUsername } from "../auth";
 import "../css/profile.css";
+import vaultLogo from "../assets/vault-logo.png";
 
 function Profile() {
   const navigate = useNavigate();
@@ -13,15 +14,8 @@ function Profile() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!username) {
-      navigate("/");
-      return;
-    }
-    fetchProfile();
-  }, [username, navigate]);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const res = await authFetch(`/api/users/${username}`);
       if (res.ok) {
@@ -33,7 +27,15 @@ function Profile() {
     } catch (err) {
       console.error("Failed to load profile");
     }
-  };
+  }, [username, navigate]);
+
+  useEffect(() => {
+    if (!username) {
+      navigate("/");
+      return;
+    }
+    fetchProfile();
+  }, [username, navigate, fetchProfile]);
 
   const handleAddContact = async (e) => {
     e.preventDefault();
@@ -84,7 +86,9 @@ function Profile() {
     <div className="profile-page">
       <nav className="profile-nav">
         <div className="profile-brand">
-          <div className="profile-logo-box" />
+          <div className="profile-logo-box">
+            <img src={vaultLogo} alt="Vault-Tech Logo" className="vault-logo-image" />
+          </div>
           <span>Vault-Tech</span>
         </div>
         <button className="back-btn" onClick={() => navigate("/dashboard")}>
@@ -94,7 +98,6 @@ function Profile() {
 
       <main className="profile-main">
         <section className="profile-card">
-          <button className="edit-icon">✎</button>
           <h2>User Profile</h2>
           <br />
           <div className="profile-form-grid">
