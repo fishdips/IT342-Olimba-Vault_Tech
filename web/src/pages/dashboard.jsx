@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseclient";
 import { authFetch, getUsername, logout } from "../auth";
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import "../css/dashboard.css";
+import vaultLogo from "../assets/vault-logo.png";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -172,10 +172,8 @@ function UnlockVaultModal({ username, vault, onClose, onUnlocked }) {
   );
 }
 
-/* ── Create Vault Modal ── */
 function CreateVaultModal({ username, onClose, onCreated }) {
   const [name, setName] = useState("");
-  const [vaultType, setVaultType] = useState("General");
   const [expiryDate, setExpiryDate] = useState("");
   const [color, setColor] = useState("#0066b1");
   const [vaultPassword, setVaultPassword] = useState("");
@@ -193,8 +191,12 @@ function CreateVaultModal({ username, onClose, onCreated }) {
       const res = await authFetch("/api/vaults", {
         method: "POST",
         body: JSON.stringify({
-          name, vaultType, expiryDate: expiryDate || null,
-          ownerUsername: username, thumbnailColor: color, vaultPassword
+          name, 
+          vaultType: "Secure Vault", 
+          expiryDate: expiryDate || null,
+          ownerUsername: username, 
+          thumbnailColor: color, 
+          vaultPassword
         }),
       });
 
@@ -239,14 +241,6 @@ function CreateVaultModal({ username, onClose, onCreated }) {
             <input type="password" required value={vaultPassword} onChange={(e) => setVaultPassword(e.target.value)} placeholder="Secure password" />
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
-            {/* <div className="field-group" style={{ flex: 1 }}>
-              <label>Type</label>
-              <select value={vaultType} onChange={(e) => setVaultType(e.target.value)}>
-                {["General","Will","Documents","Photos","Letters","Financial"].map(t => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div> */}
             <div className="field-group" style={{ flex: 1 }}>
               <label>Expiry Date</label>
               <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
@@ -274,14 +268,12 @@ function CreateVaultModal({ username, onClose, onCreated }) {
     </div>
   );
 }
-
 function EditVaultModal({ username, vault, onClose, onUpdated, onVaultTriggered }) {
   const [name, setName] = useState(vault.name || "");
-  const [vaultType, setVaultType] = useState(vault.vaultType || "General");
   const [expiryDate, setExpiryDate] = useState(vault.expiryDate || "");
   const [color, setColor] = useState(vault.thumbnailColor || "#0066b1");
   const [files, setFiles] = useState([]);
-  const [successorEmail, setSuccessorEmail] = useState(vault.successorEmail || "");
+  const [successorEmails, setSuccessorEmails] = useState(vault.successorEmails || []);
   const [trustedContacts, setTrustedContacts] = useState([]);
   const [loadingContacts, setLoadingContacts] = useState(true);
   const [isDeadman, setIsDeadman] = useState(vault.isDeadmanEnabled || false);
@@ -293,6 +285,14 @@ function EditVaultModal({ username, vault, onClose, onUpdated, onVaultTriggered 
   const navigate = useNavigate();
 
   const colors = ["#0066b1", "#8b5c29", "#1a6b4a", "#7b3fa0", "#b84a2e"];
+
+  const toggleInheritor = (email) => {
+    if (successorEmails.includes(email)) {
+      setSuccessorEmails(successorEmails.filter(e => e !== email));
+    } else {
+      setSuccessorEmails([...successorEmails, email]);
+    }
+  };
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -353,16 +353,31 @@ function EditVaultModal({ username, vault, onClose, onUpdated, onVaultTriggered 
   const handleUpdate = async (e) => {
     e.preventDefault();
     if (!name.trim()) { setError("Vault name is required."); return; }
+    if (isDeadman && expiryDate) {
+      const today = new Date();
+      const expiry = new Date(expiryDate);
+      const daysUntilExpiry = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+
+      if (parseInt(deadmanDays) >= daysUntilExpiry) {
+        setError(`Deadman timer (${deadmanDays} days) must trigger before the vault expires (in ${daysUntilExpiry} days).`);
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
       const res = await authFetch(`/api/vaults/${vault.id}`, {
         method: "PUT",
         body: JSON.stringify({
-          username, name, vaultType, expiryDate: expiryDate || null, thumbnailColor: color,
-          successorEmail: successorEmail || null,
+          username, 
+          name, 
+          vaultType: "Secure Vault", 
+          expiryDate: expiryDate || null, 
+          thumbnailColor: color,
+          successorEmails: successorEmails,
           isDeadmanEnabled: isDeadman,
-          deadmanDays: isDeadman ? deadmanDays : null
+          deadmanDays: isDeadman ? parseInt(deadmanDays) : null
         }),
       });
 
@@ -377,36 +392,19 @@ function EditVaultModal({ username, vault, onClose, onUpdated, onVaultTriggered 
 
       if (files.length > 0) {
         for (const file of files) {
-          const fileExt = file.name.split('.').pop();
-          const uniqueName = `${vault.id}_${Date.now()}.${fileExt}`;
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("vaultId", vault.id);
 
-          const { error: uploadError } = await supabase.storage
-            .from('vault-documents')
-            .upload(uniqueName, file);
-
-          if (uploadError) {
-            console.error("Supabase Storage Error:", uploadError);
-            alert(`Supabase failed to upload ${file.name}. Error: ${uploadError.message}`);
-            continue;
-          }
-
-          const { data: publicUrlData } = supabase.storage
-            .from('vault-documents')
-            .getPublicUrl(uniqueName);
-
-          const docRes = await authFetch("/api/documents", {
+          const docRes = await authFetch("/api/documents/upload", {
             method: "POST",
-            body: JSON.stringify({
-              fileName: file.name,
-              fileUrl: publicUrlData.publicUrl,
-              vaultId: vault.id
-            })
+            body: formData
           });
 
           if (!docRes.ok) {
             const backendError = await docRes.text();
-            console.error("Backend Database Error:", backendError);
-            alert(`Failed to save to Database. Error: ${backendError}`);
+            console.error("Local Storage Error:", backendError);
+            alert(`Failed to save ${file.name} to local server. Error: ${backendError}`);
           }
         }
       }
@@ -433,14 +431,7 @@ function EditVaultModal({ username, vault, onClose, onUpdated, onVaultTriggered 
           </div>
 
           <div style={{ display: 'flex', gap: '16px' }}>
-            {/* <div className="field-group" style={{ flex: 1 }}>
-              <label>Type</label>
-              <select value={vaultType} onChange={(e) => setVaultType(e.target.value)}>
-                {["General","Will","Documents","Photos","Letters","Financial"].map(t => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div> */}
+            {/* Type Dropdown Removed Entirely */}
             <div className="field-group" style={{ flex: 1 }}>
               <label>Expiry Date</label>
               <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
@@ -465,7 +456,7 @@ function EditVaultModal({ username, vault, onClose, onUpdated, onVaultTriggered 
           </h3>
 
           <div className="field-group">
-            <label>Inheritor (Trusted Contacts Only)</label>
+            <label>Inheritors (Trusted Contacts Only)</label>
             {loadingContacts ? (
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Loading contacts...</p>
             ) : trustedContacts.length === 0 ? (
@@ -473,21 +464,24 @@ function EditVaultModal({ username, vault, onClose, onUpdated, onVaultTriggered 
                 You have no trusted contacts. Add one from the dashboard first.
               </p>
             ) : (
-              <select
-                value={successorEmail}
-                onChange={(e) => setSuccessorEmail(e.target.value)}
-                style={{ marginTop: '8px' }}
-              >
-                <option value="">— None —</option>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px', background: 'var(--bg-input)', padding: '12px', borderRadius: 'var(--radius)', border: '1px solid var(--border)', maxHeight: '140px', overflowY: 'auto' }}>
                 {trustedContacts.map((contact) => (
-                  <option key={contact} value={contact}>{contact}</option>
+                  <label key={contact} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={successorEmails.includes(contact)}
+                      onChange={() => toggleInheritor(contact)}
+                      style={{ accentColor: 'var(--blue)', width: '16px', height: '16px', cursor: 'pointer' }}
+                    />
+                    <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{contact}</span>
+                  </label>
                 ))}
-              </select>
+              </div>
             )}
           </div>
 
           <div className="field-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', margin: '12px 0' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', margin: '16px 0 12px' }}>
               <input
                 type="checkbox"
                 checked={isDeadman}
@@ -495,58 +489,66 @@ function EditVaultModal({ username, vault, onClose, onUpdated, onVaultTriggered 
                 style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--blue)' }}
               />
               <span style={{ fontSize: '14px', color: 'var(--brown-light)', textTransform: 'none', letterSpacing: '0.5px' }}>
-                Enable Deadman's Switch
+                Enable Automated Deadman's Timer
               </span>
             </label>
           </div>
 
           {isDeadman && (
-            <div style={{ background: 'var(--bg-input-focus)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-              <div className="field-group">
+            <div style={{ background: 'var(--bg-input-focus)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border)', marginBottom: '16px' }}>
+              <div className="field-group" style={{ margin: 0 }}>
                 <label>Release vault after (days of inactivity)</label>
                 <input
                   type="number" min="1" value={deadmanDays}
                   onChange={(e) => setDeadmanDays(e.target.value)}
                   style={{ marginTop: '8px' }}
                 />
-              </div>
-
-              <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
-                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-                  Trigger the vault immediately and send all contents to your inheritor now.
+                <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '8px' }}>
+                  Must trigger before the vault's expiry date.
                 </p>
-                {triggerSuccess ? (
-                  <p style={{ color: 'var(--yellow)', fontSize: '13px', fontWeight: '500' }}>{triggerSuccess}</p>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleTriggerNow}
-                    disabled={triggerLoading || !successorEmail}
-                    style={{
-                      background: '#b84a2e',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: 'var(--radius)',
-                      padding: '10px 20px',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      cursor: successorEmail ? 'pointer' : 'not-allowed',
-                      opacity: successorEmail ? 1 : 0.5,
-                      width: '100%'
-                    }}
-                  >
-                    {triggerLoading ? "Triggering…" : "⚠ Trigger Now"}
-                  </button>
-                )}
-                {!successorEmail && (
-                  <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '6px' }}>
-                    Set an inheritor above to enable manual trigger.
-                  </p>
-                )}
               </div>
             </div>
           )}
 
+          {/* --- MANUAL PANIC BUTTON --- */}
+          <div style={{ background: 'rgba(184, 74, 46, 0.05)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid rgba(184, 74, 46, 0.4)', marginTop: '8px' }}>
+            <h3 style={{ fontSize: '13px', color: '#b84a2e', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              Manual Override
+            </h3>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+              Bypass all timers and instantly send all contents to your inheritor now. This cannot be undone.
+            </p>
+            
+            {triggerSuccess ? (
+              <p style={{ color: 'var(--yellow)', fontSize: '13px', fontWeight: '500' }}>{triggerSuccess}</p>
+            ) : (
+              <button
+                type="button"
+                onClick={handleTriggerNow}
+                disabled={triggerLoading || !successorEmails.length}
+                style={{
+                  background: '#b84a2e',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 'var(--radius)',
+                  padding: '10px 20px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: successorEmails.length ? 'pointer' : 'not-allowed',
+                  opacity: successorEmails.length ? 1 : 0.5,
+                  width: '100%'
+                }}
+              >
+                {triggerLoading ? "Releasing Vault…" : "⚠ Release Vault Now"}
+              </button>
+            )}
+            {!successorEmails.length && (
+              <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '8px', textAlign: 'center' }}>
+                You must assign an Inheritor above to enable the manual release.
+              </p>
+            )}
+          </div>
+          
           <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '24px 0' }} />
 
           <div className="field-group">
@@ -652,7 +654,6 @@ function VaultContentModal({ vault, onClose }) {
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
-        // ✅ CHANGED: authFetch instead of fetch
         const res = await authFetch(`/api/documents/vault/${vault.id}`);
         if (res.ok) {
           const data = await res.json();
@@ -721,18 +722,9 @@ function Dashboard() {
   const [unlockingVault, setUnlockingVault] = useState(null);
   const [viewingVault, setViewingVault] = useState(null);
 
-  useEffect(() => {
-    if (!username) {
-      navigate("/");
-      return;
-    }
-    fetchVaults();
-  }, [navigate, username]);
-
-  const fetchVaults = async () => {
+  const fetchVaults = useCallback(async () => {
     setLoading(true);
     try {
-      // ✅ CHANGED: authFetch instead of fetch
       const res = await authFetch(`/api/vaults?username=${username}`);
       if (res.status === 401 || res.status === 403) {
         logout();
@@ -746,7 +738,15 @@ function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [username, navigate]);
+
+  useEffect(() => {
+    if (!username) {
+      navigate("/");
+      return;
+    }
+    fetchVaults();
+  }, [username, navigate, fetchVaults]);
 
   const handleLogout = () => {
     logout();
@@ -756,7 +756,6 @@ function Dashboard() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this vault? This cannot be undone.")) return;
     try {
-      // ✅ CHANGED: authFetch instead of fetch
       const res = await authFetch(`/api/vaults/${id}?username=${username}`, {
         method: "DELETE",
       });
@@ -802,7 +801,9 @@ function Dashboard() {
 
       <nav className="dash-nav">
         <div className="nav-brand">
-          <div className="nav-logo-box" />
+          <div className="nav-logo-box">
+            <img src={vaultLogo} alt="Vault-Tech Logo" className="vault-logo-image" />
+          </div>
           <span className="nav-title">Vault-Tech</span>
         </div>
         <div className="nav-actions">

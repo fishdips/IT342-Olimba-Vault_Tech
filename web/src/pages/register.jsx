@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/register.css";
+import vaultLogo from "../assets/vault-logo.png";
 
 function Gear({ teeth = 8, r = 38, stroke = "#0a6aa8", strokeWidth = 2 }) {
   const R = r;
@@ -89,7 +90,9 @@ function Register() {
       <div className="register-card">
 
         <div className="register-header">
-          <div className="logo-box"></div>
+          <div className="logo-box">
+             <img src={vaultLogo} alt="Vault-Tech Logo" className="vault-logo-image" />
+          </div>
           <h1 className="register-title">Create Account</h1>
         </div>
 

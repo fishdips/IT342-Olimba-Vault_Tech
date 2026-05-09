@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../auth"; 
 import "../css/login.css";
+import vaultLogo from "../assets/vault-logo.png";
 
 function Gear({ teeth = 8, r = 38, stroke = "#85bfe6", strokeWidth = 2 }) {
   const R = r;
@@ -75,11 +76,14 @@ function Login() {
 
       <div className="login-card">
         <div className="login-header">
-          <div className="logo-box"></div>
+          <div className="logo-box">
+             <img src={vaultLogo} alt="Vault-Tech Logo" className="vault-logo-image" />
+          </div>
           <h1 className="login-title">Welcome Back</h1>
         </div>
 
         <p className="login-subtitle">Sign in to your digital vault</p>
+
 
         <form onSubmit={handleLogin} className="login-form">
           <div className="field-group">

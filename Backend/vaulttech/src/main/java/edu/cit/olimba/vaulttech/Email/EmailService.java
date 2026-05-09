@@ -41,32 +41,39 @@ public class EmailService {
         }
     }
 
-    public void sendVaultInheritorAssigned(String toEmail, String ownerUsername, String vaultName) {
+    public void sendVaultInheritorAssigned(List<String> toEmails, String ownerUsername, String vaultName) {
+        if (toEmails == null || toEmails.isEmpty()) return;
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
-            helper.setTo(toEmail);
             helper.setSubject("Vault-Tech: You have been named as a vault inheritor");
             helper.setText(
                     "Hello,\n\n" +
-                            "User '" + ownerUsername + "' has designated you as the inheritor of their vault '" + vaultName + "' on Vault-Tech.\n\n" +
+                            "User '" + ownerUsername + "' has designated you as an inheritor of their vault '" + vaultName + "' on Vault-Tech.\n\n" +
                             "When this vault is released — either by expiry, inactivity, or manual trigger — " +
                             "its contents will be sent directly to this email address.\n\n" +
                             "Stay Secure,\nThe Vault-Tech Team"
             );
-            mailSender.send(message);
+
+            for (String email : toEmails) {
+                helper.setTo(email);
+                mailSender.send(message);
+            }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to send vault inheritor assignment email: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to send vault inheritor assignment emails: " + e.getMessage(), e);
         }
     }
-    public void sendVaultContents(String toEmail, String vaultName,
+
+    public void sendVaultContents(List<String> toEmails, String vaultName,
                                   String ownerUsername, List<DocumentEntity> documents,
                                   String triggerReason) {
+        if (toEmails == null || toEmails.isEmpty()) return;
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setTo(toEmail);
             helper.setSubject("Vault-Tech: Vault '" + vaultName + "' has been released to you");
 
             String reasonText = switch (triggerReason) {
@@ -78,7 +85,7 @@ public class EmailService {
 
             helper.setText(
                     "Hello,\n\n" +
-                            "You have been designated as the inheritor of vault '" + vaultName + "' " +
+                            "You have been designated as an inheritor of vault '" + vaultName + "' " +
                             "owned by '" + ownerUsername + "' on Vault-Tech.\n\n" +
                             "Reason for release: " + reasonText + "\n\n" +
                             (documents.isEmpty()
@@ -103,9 +110,6 @@ public class EmailService {
                             ByteArrayDataSource dataSource =
                                     new ByteArrayDataSource(pdfBytes, "application/pdf");
                             helper.addAttachment(doc.getFileName(), dataSource);
-                        } else {
-                            System.err.println("Could not download: " + doc.getFileName()
-                                    + " (HTTP " + response.statusCode() + ")");
                         }
                     } catch (Exception e) {
                         System.err.println("Error attaching " + doc.getFileName() + ": " + e.getMessage());
@@ -113,7 +117,10 @@ public class EmailService {
                 }
             }
 
-            mailSender.send(message);
+            for (String email : toEmails) {
+                helper.setTo(email);
+                mailSender.send(message);
+            }
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to send vault contents: " + e.getMessage(), e);

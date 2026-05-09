@@ -31,7 +31,7 @@
 @keyframes drift    { from { transform: translate(0, 0); } to { transform: translate(30px, 20px); } }
 @keyframes cardIn   { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-/* ─── Page ───────────────────────────────────────── */
+
 .register-page {
   min-height: 100vh;
   display: flex;
@@ -69,7 +69,6 @@
   animation: drift 16s ease-in-out infinite alternate-reverse;
 }
 
-/* ─── SVG Gear Layer ─────────────────────────────── */
 .gear-layer {
   position: fixed;
   inset: 0;
@@ -146,7 +145,6 @@
   animation: spin-ccw 12s linear infinite;
 }
 
-/* ─── Card ───────────────────────────────────────── */
 .register-card {
   width: 440px;
   padding: 48px 44px 40px;
@@ -210,7 +208,6 @@
   font-weight: 300;
 }
 
-/* ─── Form ───────────────────────────────────────── */
 .register-form {
   display: flex;
   flex-direction: column;
@@ -264,7 +261,6 @@
   box-shadow: 0 0 0 3px rgba(0,102,177,0.15);
 }
 
-/* ─── Button ─────────────────────────────────────── */
 .register-btn {
   width: 100%;
   padding: 13px;
@@ -313,4 +309,10 @@
 .login-link:hover {
   color: #fffff0;
   border-color: var(--yellow);
+}
+.vault-logo-image {
+    width: 100%;
+    height: auto;
+    max-width: 200px; 
+    object-fit: contain;
 }
