@@ -40,7 +40,6 @@ public class JwtUtil {
             Claims claims = getClaims(token);
             return claims.getExpiration().after(new Date());
         } catch (Exception e) {
-            // Covers: malformed token, bad signature, expired token
             return false;
         }
     }

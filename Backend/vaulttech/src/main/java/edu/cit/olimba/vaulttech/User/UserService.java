@@ -1,7 +1,5 @@
-package edu.cit.olimba.vaulttech.Service;
+package edu.cit.olimba.vaulttech.User;
 
-import edu.cit.olimba.vaulttech.Entity.UserEntity;
-import edu.cit.olimba.vaulttech.Repository.UserRepository;
 import edu.cit.olimba.vaulttech.Security.JwtUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

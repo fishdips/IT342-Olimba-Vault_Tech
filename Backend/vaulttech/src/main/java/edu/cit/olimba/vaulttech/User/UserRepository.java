@@ -1,6 +1,5 @@
-package edu.cit.olimba.vaulttech.Repository;
+package edu.cit.olimba.vaulttech.User;
 
-import edu.cit.olimba.vaulttech.Entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
