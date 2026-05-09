@@ -1,6 +1,6 @@
-package edu.cit.olimba.vaulttech.Service;
+package edu.cit.olimba.vaulttech.Email;
 
-import edu.cit.olimba.vaulttech.Entity.DocumentEntity;
+import edu.cit.olimba.vaulttech.Document.DocumentEntity;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
 import org.springframework.mail.javamail.JavaMailSender;

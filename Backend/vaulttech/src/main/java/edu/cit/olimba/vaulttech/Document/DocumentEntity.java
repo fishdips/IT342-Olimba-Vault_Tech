@@ -1,4 +1,4 @@
-package edu.cit.olimba.vaulttech.Entity;
+package edu.cit.olimba.vaulttech.Document;
 
 import edu.cit.olimba.vaulttech.Vault.VaultEntity;
 import jakarta.persistence.*;

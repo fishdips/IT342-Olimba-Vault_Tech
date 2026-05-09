@@ -1,11 +1,10 @@
-package edu.cit.olimba.vaulttech.Service;
+package edu.cit.olimba.vaulttech.Vault;
 
-import edu.cit.olimba.vaulttech.Entity.DocumentEntity;
-import edu.cit.olimba.vaulttech.Entity.UserEntity;
-import edu.cit.olimba.vaulttech.Entity.VaultEntity;
-import edu.cit.olimba.vaulttech.Repository.DocumentRepository;
-import edu.cit.olimba.vaulttech.Repository.UserRepository;
-import edu.cit.olimba.vaulttech.Repository.VaultRepository;
+import edu.cit.olimba.vaulttech.Document.DocumentEntity;
+import edu.cit.olimba.vaulttech.Email.EmailService;
+import edu.cit.olimba.vaulttech.User.UserEntity;
+import edu.cit.olimba.vaulttech.Document.DocumentRepository;
+import edu.cit.olimba.vaulttech.User.UserRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

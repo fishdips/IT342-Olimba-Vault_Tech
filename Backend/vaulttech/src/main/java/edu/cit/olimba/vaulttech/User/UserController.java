@@ -1,9 +1,6 @@
-package edu.cit.olimba.vaulttech.Controller;
+package edu.cit.olimba.vaulttech.User;
 
-import edu.cit.olimba.vaulttech.Entity.UserEntity;
-import edu.cit.olimba.vaulttech.Repository.UserRepository;
-import edu.cit.olimba.vaulttech.Service.EmailService;
-import edu.cit.olimba.vaulttech.Service.UserService;
+import edu.cit.olimba.vaulttech.Email.EmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

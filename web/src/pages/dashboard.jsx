@@ -239,14 +239,14 @@ function CreateVaultModal({ username, onClose, onCreated }) {
             <input type="password" required value={vaultPassword} onChange={(e) => setVaultPassword(e.target.value)} placeholder="Secure password" />
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
-            <div className="field-group" style={{ flex: 1 }}>
+            {/* <div className="field-group" style={{ flex: 1 }}>
               <label>Type</label>
               <select value={vaultType} onChange={(e) => setVaultType(e.target.value)}>
                 {["General","Will","Documents","Photos","Letters","Financial"].map(t => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </select>
-            </div>
+            </div> */}
             <div className="field-group" style={{ flex: 1 }}>
               <label>Expiry Date</label>
               <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
@@ -433,14 +433,14 @@ function EditVaultModal({ username, vault, onClose, onUpdated, onVaultTriggered 
           </div>
 
           <div style={{ display: 'flex', gap: '16px' }}>
-            <div className="field-group" style={{ flex: 1 }}>
+            {/* <div className="field-group" style={{ flex: 1 }}>
               <label>Type</label>
               <select value={vaultType} onChange={(e) => setVaultType(e.target.value)}>
                 {["General","Will","Documents","Photos","Letters","Financial"].map(t => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </select>
-            </div>
+            </div> */}
             <div className="field-group" style={{ flex: 1 }}>
               <label>Expiry Date</label>
               <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />

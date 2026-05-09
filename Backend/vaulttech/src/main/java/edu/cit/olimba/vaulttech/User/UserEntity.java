@@ -1,4 +1,4 @@
-package edu.cit.olimba.vaulttech.Entity;
+package edu.cit.olimba.vaulttech.User;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
