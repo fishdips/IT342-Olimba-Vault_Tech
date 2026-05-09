@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { authFetch, getUsername } from "../auth";
-import "../css/profile.css";
-import vaultLogo from "../assets/vault-logo.png";
+import { authFetch, getUsername } from "../../auth";
+import "./profile.css";
+import vaultLogo from "../../assets/vault-logo.png";
 
 function Profile() {
   const navigate = useNavigate();
