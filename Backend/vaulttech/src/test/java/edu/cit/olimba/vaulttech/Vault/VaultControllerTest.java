@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(VaultController.class)
@@ -44,7 +45,7 @@ public class VaultControllerTest {
     }
 
     @Test
-    void TC_VAULT_01_createVaultSuccess() throws Exception {
+    void createVaultSuccess() throws Exception {
         String requestBody = "{\"name\":\"My Vault\", \"ownerUsername\":\"testuser\", \"vaultPassword\":\"secure123\"}";
 
         Mockito.when(vaultService.createVault(
@@ -59,7 +60,7 @@ public class VaultControllerTest {
     }
 
     @Test
-    void TC_VAULT_02_verifyPasswordSuccess() throws Exception {
+    void verifyPasswordSuccess() throws Exception {
         String requestBody = "{\"username\":\"testuser\", \"password\":\"secure123\"}";
 
         Mockito.when(vaultService.verifyVaultPassword(1L, "testuser", "secure123"))
@@ -72,12 +73,28 @@ public class VaultControllerTest {
     }
 
     @Test
-    void TC_VAULT_03_manualTriggerSuccess() throws Exception {
+    void manualTriggerSuccess() throws Exception {
         String requestBody = "{\"username\":\"testuser\"}";
 
         Mockito.doNothing().when(vaultService).manualTriggerVault(1L, "testuser");
 
         mockMvc.perform(post("/api/vaults/1/trigger")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateVaultInheritorsSuccess() throws Exception {
+        String requestBody = "{\"username\":\"testuser\", \"name\":\"Updated Vault\", \"vaultType\":\"Secure\", \"thumbnailColor\":\"#000\", \"successorEmails\":[\"olimbajayz789@gmail.com\"], \"isDeadmanEnabled\":true, \"deadmanDays\":30}";
+
+        Mockito.when(vaultService.updateVault(
+                        Mockito.eq(1L), Mockito.anyString(), Mockito.anyString(), Mockito.any(),
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyList(),
+                        Mockito.anyBoolean(), Mockito.anyInt()))
+                .thenReturn(new VaultEntity());
+
+        mockMvc.perform(put("/api/vaults/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk());
