@@ -1,4 +1,4 @@
-package com.example.vault_tech.API
+package com.example.vault_tech.auth
 
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -12,12 +12,12 @@ interface AuthApiService {
     @POST("/api/users/register")
     suspend fun register(
         @Body user: UserRequest
-    ): Response<ResponseBody> // Changed to raw ResponseBody
+    ): Response<ResponseBody>
 
     @FormUrlEncoded
     @POST("/api/users/login")
     suspend fun login(
         @Field("email") email: String,
         @Field("password") password: String
-    ): Response<ResponseBody> // Changed to raw ResponseBody
+    ): Response<ResponseBody>
 }

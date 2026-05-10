@@ -7,42 +7,40 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="20dp"
-    android:background="@android:color/white"
-    tools:context=".LoginActivity">
+    android:padding="24dp"
+    android:background="#001423"
+    tools:context=".auth.LoginActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginBottom="30dp">
+        android:padding="32dp"
+        android:background="@drawable/bg_vault_card"
+        android:elevation="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="8dp">
 
-            <TextView
-                android:id="@+id/logo_placeholder"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+            <ImageView
+                android:id="@+id/logo_image"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:layout_marginEnd="15dp"
-                android:background="@drawable/logo_background"
-                android:text="LOGO"
-                android:gravity="center"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:src="@drawable/vault_logo"
+                android:contentDescription="Vault-Tech Logo" />
 
             <TextView
                 android:id="@+id/login_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Welcome Back"
-                android:textSize="32sp"
-                android:textColor="@android:color/black"
+                android:textSize="24sp"
+                android:textColor="#ffe1ba"
                 android:fontFamily="serif"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -53,69 +51,90 @@
             android:layout_height="wrap_content"
             android:text="Sign in to your digital vault"
             android:textSize="14sp"
-            android:textColor="#555555"
-            android:fontFamily="monospace" />
+            android:textColor="#4a7a9b"
+            android:layout_marginBottom="32dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="EMAIL ADDRESS"
+            android:textColor="#6a9dbf"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/et_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:padding="14dp"
+            android:textColor="#ffe1ba"
+            android:textColorHint="#4a7a9b"
+            android:textSize="15sp"
+            android:background="@drawable/bg_vault_input"
+            android:inputType="textEmailAddress" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PASSWORD"
+            android:textColor="#6a9dbf"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/et_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="36dp"
+            android:padding="14dp"
+            android:textColor="#ffe1ba"
+            android:textColorHint="#4a7a9b"
+            android:textSize="15sp"
+            android:background="@drawable/bg_vault_input"
+            android:inputType="textPassword" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:padding="14dp"
+            android:text="LOG IN"
+            android:letterSpacing="0.15"
+            android:textStyle="bold"
+            android:background="@drawable/bg_vault_button"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Don't have an account? "
+                android:textColor="#4a7a9b"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_register_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Register"
+                android:textColor="#ffe1ba"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
     </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Email"
-        android:textColor="@android:color/black"
-        android:layout_marginBottom="5dp"
-        android:textStyle="normal" />
-
-    <EditText
-        android:id="@+id/et_email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:padding="12dp"
-        android:hint="Email Address"
-        android:background="@drawable/input_field_background"
-        android:inputType="textEmailAddress" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Password"
-        android:textColor="@android:color/black"
-        android:layout_marginBottom="5dp"
-        android:textStyle="normal" />
-
-    <EditText
-        android:id="@+id/et_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
-        android:padding="12dp"
-        android:hint="Password"
-        android:background="@drawable/input_field_background"
-        android:inputType="textPassword" />
-
-    <Button
-        android:id="@+id/btn_login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:text="Log In"
-        android:textAllCaps="false"
-        app:cornerRadius="15dp"
-        android:backgroundTint="#777777"
-        android:textColor="@android:color/white"
-        android:fontFamily="monospace"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/tv_register_link"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Don't have an account? [Register]"
-        android:textColor="#666666"
-        android:fontFamily="monospace"
-        android:textSize="12sp"
-        android:clickable="true"
-        android:focusable="true" />
-
 </LinearLayout>
