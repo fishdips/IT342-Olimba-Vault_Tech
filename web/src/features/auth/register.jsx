@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../css/register.css";
-import vaultLogo from "../assets/vault-logo.png";
+import "./register.css";
+import vaultLogo from "../../assets/vault-logo.png";
 
 function Gear({ teeth = 8, r = 38, stroke = "#0a6aa8", strokeWidth = 2 }) {
   const R = r;
