@@ -32,8 +32,7 @@ public class VaultService {
     }
 
     public VaultEntity updateVault(Long id, String username, String name, LocalDate expiryDate,
-                                   String type, String color, List<String> successorEmails,
-                                   Boolean isDeadman, Integer deadmanDays) {
+                                   String type, String color, List<String> successorEmails) {
         VaultEntity vault = vaultRepository.findByIdAndOwnerUsername(id, username)
                 .orElseThrow(() -> new IllegalArgumentException("Vault not found."));
 
@@ -42,8 +41,6 @@ public class VaultService {
         vault.setVaultType(type);
         vault.setThumbnailColor(color);
         vault.setSuccessorEmails(successorEmails);
-        vault.setIsDeadmanEnabled(isDeadman);
-        vault.setDeadmanDays(deadmanDays);
         vault.computeDaysRemaining();
 
         return vaultRepository.save(vault);

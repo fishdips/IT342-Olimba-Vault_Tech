@@ -86,10 +86,6 @@ public class VaultController {
             @SuppressWarnings("unchecked")
             List<String> successorEmails = (List<String>) body.get("successorEmails");
 
-            Boolean isDeadman     = (Boolean) body.get("isDeadmanEnabled");
-            Integer deadmanDays   = body.get("deadmanDays") != null
-                    ? Integer.parseInt(body.get("deadmanDays").toString()) : null;
-
             if (username == null || username.isBlank())
                 return ResponseEntity.badRequest().body("Username is required.");
 
@@ -98,7 +94,7 @@ public class VaultController {
 
             VaultEntity updated = vaultService.updateVault(
                     id, username, name, expiryDate, vaultType, thumbnailColor,
-                    successorEmails, isDeadman, deadmanDays);
+                    successorEmails);
 
             return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {

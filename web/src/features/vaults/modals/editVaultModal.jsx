@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authFetch } from "../../../auth";
+import { supabase } from "../../../supabaseclient";
 
 function EditVaultModal({ username, vault, onClose, onUpdated }) {
   const [name, setName] = useState(vault.name || "");
@@ -10,8 +11,6 @@ function EditVaultModal({ username, vault, onClose, onUpdated }) {
   const [successorEmails, setSuccessorEmails] = useState(vault.successorEmails || []);
   const [trustedContacts, setTrustedContacts] = useState([]);
   const [loadingContacts, setLoadingContacts] = useState(true);
-  const [isDeadman, setIsDeadman] = useState(vault.isDeadmanEnabled || false);
-  const [deadmanDays, setDeadmanDays] = useState(vault.deadmanDays || 30);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [triggerLoading, setTriggerLoading] = useState(false);
@@ -87,15 +86,6 @@ function EditVaultModal({ username, vault, onClose, onUpdated }) {
   const handleUpdate = async (e) => {
     e.preventDefault();
     if (!name.trim()) { setError("Vault name is required."); return; }
-    if (isDeadman && expiryDate) {
-      const today = new Date();
-      const expiry = new Date(expiryDate);
-      const daysUntilExpiry = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-      if (parseInt(deadmanDays) >= daysUntilExpiry) {
-        setError(`Deadman timer (${deadmanDays} days) must trigger before the vault expires (in ${daysUntilExpiry} days).`);
-        return;
-      }
-    }
 
     setLoading(true);
 
@@ -109,8 +99,8 @@ function EditVaultModal({ username, vault, onClose, onUpdated }) {
           expiryDate: expiryDate || null,
           thumbnailColor: color,
           successorEmails,
-          isDeadmanEnabled: isDeadman,
-          deadmanDays: isDeadman ? parseInt(deadmanDays) : null
+          isDeadmanEnabled: false, 
+          deadmanDays: null
         }),
       });
 
@@ -125,19 +115,38 @@ function EditVaultModal({ username, vault, onClose, onUpdated }) {
 
       if (files.length > 0) {
         for (const file of files) {
-          const formData = new FormData();
-          formData.append("file", file);
-          formData.append("vaultId", vault.id);
+          try {
+            const filePath = `${vault.id}/${Date.now()}_${file.name}`;
+            const { error: uploadError } = await supabase.storage
+              .from('vault-documents') 
+              .upload(filePath, file);
 
-          const docRes = await authFetch("/api/documents/upload", {
-            method: "POST",
-            body: formData
-          });
+            if (uploadError) throw uploadError;
 
-          if (!docRes.ok) {
-            const backendError = await docRes.text();
-            console.error("Local Storage Error:", backendError);
-            alert(`Failed to save ${file.name} to local server. Error: ${backendError}`);
+            const { data: { publicUrl } } = supabase.storage
+              .from('vault-documents') 
+              .getPublicUrl(filePath);
+
+            const docRes = await authFetch("/api/documents", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                fileName: file.name,
+                fileUrl: publicUrl,
+                vaultId: vault.id
+              })
+            });
+
+            if (!docRes.ok) {
+              const backendError = await docRes.text();
+              console.error("Backend Metadata Error:", backendError);
+              alert(`Failed to save ${file.name} metadata to database. Error: ${backendError}`);
+            }
+          } catch (err) {
+            console.error("Supabase Upload Error:", err);
+            alert(`Failed to upload ${file.name} to Supabase: ${err.message}`);
           }
         }
       }
@@ -212,38 +221,8 @@ function EditVaultModal({ username, vault, onClose, onUpdated }) {
             )}
           </div>
 
-          <div className="field-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', margin: '16px 0 12px' }}>
-              <input
-                type="checkbox"
-                checked={isDeadman}
-                onChange={(e) => setIsDeadman(e.target.checked)}
-                style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--blue)' }}
-              />
-              <span style={{ fontSize: '14px', color: 'var(--brown-light)', textTransform: 'none', letterSpacing: '0.5px' }}>
-                Enable Automated Deadman's Timer
-              </span>
-            </label>
-          </div>
-
-          {isDeadman && (
-            <div style={{ background: 'var(--bg-input-focus)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border)', marginBottom: '16px' }}>
-              <div className="field-group" style={{ margin: 0 }}>
-                <label>Release vault after (days of inactivity)</label>
-                <input
-                  type="number" min="1" value={deadmanDays}
-                  onChange={(e) => setDeadmanDays(e.target.value)}
-                  style={{ marginTop: '8px' }}
-                />
-                <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '8px' }}>
-                  Must trigger before the vault's expiry date.
-                </p>
-              </div>
-            </div>
-          )}
-
           {/* Manual Override / Panic Button */}
-          <div style={{ background: 'rgba(184, 74, 46, 0.05)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid rgba(184, 74, 46, 0.4)', marginTop: '8px' }}>
+          <div style={{ background: 'rgba(184, 74, 46, 0.05)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid rgba(184, 74, 46, 0.4)', marginTop: '24px' }}>
             <h3 style={{ fontSize: '13px', color: '#b84a2e', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
               Manual Override
             </h3>
