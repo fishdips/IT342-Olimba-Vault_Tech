@@ -46,11 +46,6 @@ public class VaultEntity {
     @Column(name = "email")
     private List<String> successorEmails = new ArrayList<>();
 
-    @Column(name = "is_deadman_enabled")
-    private Boolean isDeadmanEnabled = false;
-
-    @Column(name = "deadman_days")
-    private Integer deadmanDays;
 
     @OneToMany(mappedBy = "vault", fetch = FetchType.EAGER)
     private List<DocumentEntity> documents;
@@ -67,7 +62,6 @@ public class VaultEntity {
         this.thumbnailColor = thumbnailColor;
         this.vaultPassword = vaultPassword;
         this.isActive = true;
-        this.isDeadmanEnabled = false;
         computeDaysRemaining();
     }
 
@@ -105,9 +99,5 @@ public class VaultEntity {
     public void setVaultPassword(String vaultPassword) { this.vaultPassword = vaultPassword; }
     public List<String> getSuccessorEmails() { return successorEmails; }
     public void setSuccessorEmails(List<String> successorEmails) { this.successorEmails = successorEmails; }
-    public Boolean getIsDeadmanEnabled() { return isDeadmanEnabled; }
-    public void setIsDeadmanEnabled(Boolean isDeadmanEnabled) { this.isDeadmanEnabled = isDeadmanEnabled; }
-    public Integer getDeadmanDays() { return deadmanDays; }
-    public void setDeadmanDays(Integer deadmanDays) { this.deadmanDays = deadmanDays; }
     public List<DocumentEntity> getDocuments() { return documents; }
 }

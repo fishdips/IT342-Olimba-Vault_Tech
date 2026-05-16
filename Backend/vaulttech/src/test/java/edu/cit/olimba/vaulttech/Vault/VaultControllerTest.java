@@ -86,12 +86,12 @@ public class VaultControllerTest {
 
     @Test
     void updateVaultInheritorsSuccess() throws Exception {
-        String requestBody = "{\"username\":\"testuser\", \"name\":\"Updated Vault\", \"vaultType\":\"Secure\", \"thumbnailColor\":\"#000\", \"successorEmails\":[\"olimbajayz789@gmail.com\"], \"isDeadmanEnabled\":true, \"deadmanDays\":30}";
+        String requestBody = "{\"username\":\"testuser\", \"name\":\"Updated Vault\", \"vaultType\":\"Secure\", \"thumbnailColor\":\"#000\", \"successorEmails\":[\"olimbajayz789@gmail.com\"]}";
 
+        // Removed Mockito.anyBoolean() and Mockito.anyInt() to match the new 7-parameter updateVault method
         Mockito.when(vaultService.updateVault(
                         Mockito.eq(1L), Mockito.anyString(), Mockito.anyString(), Mockito.any(),
-                        Mockito.anyString(), Mockito.anyString(), Mockito.anyList(),
-                        Mockito.anyBoolean(), Mockito.anyInt()))
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyList()))
                 .thenReturn(new VaultEntity());
 
         mockMvc.perform(put("/api/vaults/1")
